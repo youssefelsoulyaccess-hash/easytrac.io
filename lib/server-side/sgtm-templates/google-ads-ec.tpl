@@ -171,11 +171,22 @@ if (!data.gclid && !data.wbraid && !data.gbraid) {
 }
 
 // ── SHA-256 helpers ────────────────────────────────────────────────────────
+// Sandbox-safe hex check (GTM sandboxed JS does NOT support regex literals)
+function isHex64(s) {
+  if (!s || s.length !== 64) return false;
+  var hexChars = '0123456789abcdef';
+  var i;
+  for (i = 0; i < 64; i++) {
+    if (hexChars.indexOf(s.charAt(i)) === -1) return false;
+  }
+  return true;
+}
+
 function hash(raw) {
   if (!raw) return undefined;
   var s = makeString(raw).toLowerCase().trim();
   if (!s) return undefined;
-  if (s.length === 64 && /^[a-f0-9]+$/.test(s)) return s;
+  if (isHex64(s)) return s;
   return sha256Sync(s, { outputEncoding: 'hex' });
 }
 
@@ -183,7 +194,7 @@ function hashPhone(raw) {
   if (!raw) return undefined;
   var s = makeString(raw).trim().split(' ').join('').split('-').join('').split('(').join('').split(')').join('').split('.').join('');
   if (!s) return undefined;
-  if (s.length === 64 && /^[a-f0-9]+$/.test(s)) return s;
+  if (isHex64(s)) return s;
   return sha256Sync(s, { outputEncoding: 'hex' });
 }
 
@@ -315,7 +326,7 @@ sendHttpRequest(url, {
   data.gtmOnFailure();
 });
 
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
 
 ___SERVER_PERMISSIONS___
 
